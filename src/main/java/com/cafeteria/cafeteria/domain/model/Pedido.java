@@ -38,7 +38,15 @@ public Pedido(UUID mesaUId){
     }
     this.status = novo;
 }
-
+    public static Pedido reconstituir(UUID id, UUID mesaId,
+                                      StatusPedido status,
+                                      LocalDateTime criadoEm) {
+        Pedido pedido = new Pedido(mesaId);
+        pedido.id = id;
+        pedido.status = status;
+        pedido.criadoEm = criadoEm;
+        return pedido;
+    }
     public UUID getId() {
         return id;
     }

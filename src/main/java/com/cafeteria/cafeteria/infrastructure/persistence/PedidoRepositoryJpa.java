@@ -48,16 +48,20 @@ public class PedidoRepositoryJpa implements PedidoRepository {
 
         return entity;
     }
-
     private Pedido toDomain(PedidoEntity entity) {
-        Pedido pedido = new Pedido(entity.getMesaId());
+        Pedido pedido = Pedido.reconstituir(
+                entity.getId(),
+                entity.getMesaId(),
+                entity.getStatus(),
+                entity.getCriadoEm()
+        );
         entity.getItens().forEach(item ->
-            pedido.adicionarItem(new ItemPedido(
-                item.getProdutoId(),
-                item.getNomeProduto(),
-                item.getPrecoUnitario(),
-                item.getQuantidade()
-            ))
+                pedido.adicionarItem(new ItemPedido(
+                        item.getProdutoId(),
+                        item.getNomeProduto(),
+                        item.getPrecoUnitario(),
+                        item.getQuantidade()
+                ))
         );
         return pedido;
     }
