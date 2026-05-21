@@ -18,7 +18,7 @@ public ItemPedido(UUID id, String nomeProduto, BigDecimal precoUnitario, Integer
 public BigDecimal calcularSubTotal() {
     return precoUnitario.multiply( BigDecimal.valueOf(quantidade));
 }
-    public UUID getId() {
+    public UUID getProdutoId() {
         return id;
     }
     public String getNomeProduto() {

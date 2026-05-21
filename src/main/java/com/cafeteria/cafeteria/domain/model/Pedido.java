@@ -23,13 +23,13 @@ public Pedido(UUID mesaUId){
     if (item == null){throw  new DomainException("Item não pode ser nulo.");}
     this.itens.add(item);
     }
-    public BigDecimal calculaTotal(){
+    public BigDecimal calcularTotal(){
         return itens.stream().map(
                 ItemPedido::calcularSubTotal).
                 reduce(BigDecimal.ZERO,
                 BigDecimal::add);
     }
-    public void atualizaStatus(StatusPedido novo){
+    public void atualizarStatus(StatusPedido novo){
     if (novo ==StatusPedido.AGUARDANDO_PAGAMENTO && itens.isEmpty()){
         throw  new DomainException("Pedido não pode ser confirmado sem itens");
     }
@@ -43,7 +43,7 @@ public Pedido(UUID mesaUId){
         return id;
     }
 
-    public UUID getMesaUId() {
+    public UUID getMesaId() {
         return mesaUId;
     }
 
