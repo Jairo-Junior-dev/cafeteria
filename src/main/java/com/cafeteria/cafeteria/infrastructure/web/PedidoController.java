@@ -1,5 +1,6 @@
 package com.cafeteria.cafeteria.infrastructure.web;
 
+import com.cafeteria.cafeteria.application.usecase.BuscarPedidoUseCaseImpl;
 import com.cafeteria.cafeteria.domain.model.Pedido;
 import com.cafeteria.cafeteria.domain.model.StatusPedido;
 import com.cafeteria.cafeteria.domain.port.in.AtualizarStatusUseCase;
@@ -16,9 +17,14 @@ public class PedidoController {
 
     private final RealizarPedidoUseCase realizarPedidoUseCase;
     private  final AtualizarStatusUseCase  atualizarStatusUseCase;
-    public PedidoController(RealizarPedidoUseCase realizarPedidoUseCase , AtualizarStatusUseCase  atualizarStatusUseCase) {
+    private final  BuscarPedidoUseCase buscarPedidoUseCase;
+
+    public PedidoController(RealizarPedidoUseCase realizarPedidoUseCase,
+                            AtualizarStatusUseCase  atualizarStatusUseCase,
+                            BuscarPedidoUseCase buscarPedidoUseCase) {
         this.realizarPedidoUseCase = realizarPedidoUseCase;
         this.atualizarStatusUseCase = atualizarStatusUseCase;
+        this.buscarPedidoUseCase = buscarPedidoUseCase;
     }
 
     @PostMapping
@@ -41,6 +47,11 @@ public class PedidoController {
     @PutMapping("/{id}/status")
     public PedidoResponse atualizarStatus(@PathVariable UUID id,@RequestBody AtualizarStatusRequest  request) {
         Pedido pedido = atualizarStatusUseCase.atualizar(id, request.status());
+        return new PedidoResponse(pedido.getId(), pedido.getStatus().name(), pedido.calcularTotal());
+    }
+    @GetMapping("/{id}")
+    public PedidoResponse buscar(@PathVariable UUID id) {
+        Pedido pedido = buscarPedidoUseCase.buscarPedido(id);
         return new PedidoResponse(pedido.getId(), pedido.getStatus().name(), pedido.calcularTotal());
     }
 
