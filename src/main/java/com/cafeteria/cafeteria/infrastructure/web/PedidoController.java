@@ -8,6 +8,7 @@ import com.cafeteria.cafeteria.domain.port.in.RealizarPedidoUseCase;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,17 +43,18 @@ public class PedidoController {
                 .toList()
         );
 
-        return new PedidoResponse(pedido.getId(), pedido.getStatus().name(), pedido.calcularTotal());
+        return toResponse(pedido);
     }
+
     @PutMapping("/{id}/status")
     public PedidoResponse atualizarStatus(@PathVariable UUID id,@RequestBody AtualizarStatusRequest  request) {
         Pedido pedido = atualizarStatusUseCase.atualizar(id, request.status());
-        return new PedidoResponse(pedido.getId(), pedido.getStatus().name(), pedido.calcularTotal());
+        return toResponse(pedido);
     }
     @GetMapping("/{id}")
     public PedidoResponse buscar(@PathVariable UUID id) {
         Pedido pedido = buscarPedidoUseCase.buscarPedido(id);
-        return new PedidoResponse(pedido.getId(), pedido.getStatus().name(), pedido.calcularTotal());
+        return toResponse(pedido);
     }
 
     record RealizarPedidoRequest(
@@ -73,6 +75,30 @@ public class PedidoController {
     record PedidoResponse(
         UUID id,
         String status,
-        java.math.BigDecimal total
+        BigDecimal total,
+        List<ItemResponse> itemResponse
     ) {}
+    record ItemResponse(  UUID produtoId,
+                          String nomeProduto,
+                          BigDecimal precoUnitario,
+                          Integer quantidade,
+                          BigDecimal subtotal){}
+    private PedidoResponse toResponse(Pedido pedido) {
+        List<ItemResponse> itens = pedido.getItens().stream()
+                .map(item -> new ItemResponse(
+                        item.getProdutoId(),
+                        item.getNomeProduto(),
+                        item.getPrecoUnitario(),
+                        item.getQuantidade(),
+                        item.calcularSubTotal()
+                ))
+                .toList();
+
+        return new PedidoResponse(
+                pedido.getId(),
+                pedido.getStatus().name(),
+                pedido.calcularTotal(),
+                itens
+        );
+    }
 }
