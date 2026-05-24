@@ -2,8 +2,10 @@ package com.cafeteria.cafeteria.application.usecase;
 
 import com.cafeteria.cafeteria.domain.model.ItemPedido;
 import com.cafeteria.cafeteria.domain.model.Pedido;
+import com.cafeteria.cafeteria.domain.model.PedidoRealizadoEvent;
 import com.cafeteria.cafeteria.domain.model.StatusPedido;
 import com.cafeteria.cafeteria.domain.port.in.RealizarPedidoUseCase;
+import com.cafeteria.cafeteria.domain.port.out.PedidoEventPublisher;
 import com.cafeteria.cafeteria.domain.port.out.PedidoRepository;
 
 import java.util.List;
@@ -11,9 +13,10 @@ import java.util.List;
 public class RealizarPedidoUseCaseImpl implements RealizarPedidoUseCase {
 
     private final PedidoRepository pedidoRepository;
-
-    public RealizarPedidoUseCaseImpl(PedidoRepository pedidoRepository) {
+    private final PedidoEventPublisher eventPublisher;
+    public RealizarPedidoUseCaseImpl(PedidoRepository pedidoRepository , PedidoEventPublisher eventPublisher) {
         this.pedidoRepository = pedidoRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -30,7 +33,8 @@ public class RealizarPedidoUseCaseImpl implements RealizarPedidoUseCase {
         ));
 
         pedido.atualizarStatus(StatusPedido.AGUARDANDO_PAGAMENTO);
-
-        return pedidoRepository.salvar(pedido);
+        Pedido salvo =  pedidoRepository.salvar(pedido);
+        eventPublisher.publicar(PedidoRealizadoEvent.de(salvo));
+        return salvo;
     }
 }
