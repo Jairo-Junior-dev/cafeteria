@@ -1,9 +1,11 @@
 package com.cafeteria.cafeteria.infrastructure.config;
 
-import com.cafeteria.cafeteria.application.usecase.AtualizarStatusUseCaseImpl;
-import com.cafeteria.cafeteria.application.usecase.BuscarPedidoUseCaseImpl;
-import com.cafeteria.cafeteria.application.usecase.RealizarPedidoUseCaseImpl;
+import com.cafeteria.cafeteria.application.usecase.*;
+import com.cafeteria.cafeteria.domain.model.Pedido;
+import com.cafeteria.cafeteria.domain.port.in.AdicionarProdutoUseCase;
 import com.cafeteria.cafeteria.domain.port.in.AtualizarStatusUseCase;
+import com.cafeteria.cafeteria.domain.port.in.BuscarCardapioUseCase;
+import com.cafeteria.cafeteria.domain.port.out.ProdutoCache;
 import com.cafeteria.cafeteria.infrastructure.web.BuscarPedidoUseCase;
 import com.cafeteria.cafeteria.domain.port.in.RealizarPedidoUseCase;
 import com.cafeteria.cafeteria.domain.port.out.PedidoEventPublisher;
@@ -78,5 +80,12 @@ public class BeanConfiguration {
         factory.setConsumerFactory(consumerFactory);
         return factory;
     }
-
+    @Bean
+    public BuscarCardapioUseCase buscarCardapioUseCase(ProdutoCache produtoCache){
+        return new BuscarCardapioUseCaseIMPL(produtoCache);
+    }
+    @Bean
+    public AdicionarProdutoUseCase adicionarProdutoUseCase(ProdutoCache produtoCache){
+        return new AdicionarProdutoUseCaseImpl(produtoCache);
+    }
 }
