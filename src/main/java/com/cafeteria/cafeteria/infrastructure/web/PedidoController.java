@@ -7,6 +7,11 @@ import com.cafeteria.cafeteria.domain.port.in.AtualizarStatusUseCase;
 import com.cafeteria.cafeteria.domain.port.in.RealizarPedidoUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +38,7 @@ public class PedidoController {
     @Operation(summary = "Realizar um novo pedido")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public PedidoResponse realizar(@RequestBody RealizarPedidoRequest request) {
+    public PedidoResponse realizar(@Valid @RequestBody RealizarPedidoRequest request) {
         Pedido pedido = realizarPedidoUseCase.realizar(
             request.mesaId(),
             request.itens().stream()
@@ -62,14 +67,22 @@ public class PedidoController {
     }
 
     record RealizarPedidoRequest(
+            @NotNull(message = "Mesa é obrigatória")
             UUID mesaId,
-        List<ItemRequest> itens
+            @NotEmpty(message = "Pedido deve ter pelo menos um item")
+            List<@Valid ItemRequest> itens
     ) {}
 
     record ItemRequest(
-        UUID produtoId,
+        @NotNull(message="Produto é obrigatório")
+            UUID produtoId,
+        @NotBlank(message = "Nome do produto é obrigatório")
         String nomeProduto,
+        @NotNull(message="Preço do produto é obrigatório")
+        @Positive(message = "Preço do produto deve ser maior que zero")
         java.math.BigDecimal precoUnitario,
+        @NotNull(message="Quantidade é obrigatória")
+        @Positive(message = "Quantidade deve ser maior que zero")
         Integer quantidade
     ) {}
 

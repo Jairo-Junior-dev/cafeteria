@@ -5,6 +5,7 @@ import com.cafeteria.cafeteria.domain.port.in.AdicionarProdutoUseCase;
 import com.cafeteria.cafeteria.domain.port.in.BuscarCardapioUseCase;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +37,7 @@ public CardapioController(BuscarCardapioUseCase  buscarCardapioUseCase, Adiciona
 @Operation(summary="Adicionar produto ao Cardápio")
 @PostMapping
 @ResponseStatus(HttpStatus.CREATED)
-public Produto adicionarProduto(@RequestBody AdicionarProdutoUseCase.ProdutoRequestAdd produto){
+public Produto adicionarProduto(@Valid @RequestBody AdicionarProdutoUseCase.ProdutoRequestAdd produto){
     return adicionarProdutoUseCase.adicionarProduto(produto);
 }
 
