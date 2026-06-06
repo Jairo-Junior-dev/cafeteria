@@ -5,6 +5,8 @@ import com.cafeteria.cafeteria.domain.model.Pedido;
 import com.cafeteria.cafeteria.domain.model.StatusPedido;
 import com.cafeteria.cafeteria.domain.port.in.AtualizarStatusUseCase;
 import com.cafeteria.cafeteria.domain.port.in.RealizarPedidoUseCase;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/pedidos")
+@Tag(name = "Pedidos", description = "Gerenciamento de pedidos da cafeteria")
 public class PedidoController {
 
     private final RealizarPedidoUseCase realizarPedidoUseCase;
@@ -27,7 +30,7 @@ public class PedidoController {
         this.atualizarStatusUseCase = atualizarStatusUseCase;
         this.buscarPedidoUseCase = buscarPedidoUseCase;
     }
-
+    @Operation(summary = "Realizar um novo pedido")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PedidoResponse realizar(@RequestBody RealizarPedidoRequest request) {
@@ -45,12 +48,13 @@ public class PedidoController {
 
         return toResponse(pedido);
     }
-
+    @Operation(summary="Atualizar Status do pedido" )
     @PutMapping("/{id}/status")
     public PedidoResponse atualizarStatus(@PathVariable UUID id,@RequestBody AtualizarStatusRequest  request) {
         Pedido pedido = atualizarStatusUseCase.atualizar(id, request.status());
         return toResponse(pedido);
     }
+    @Operation(summary = "Buscar Pedido Por ID")
     @GetMapping("/{id}")
     public PedidoResponse buscar(@PathVariable UUID id) {
         Pedido pedido = buscarPedidoUseCase.buscarPedido(id);
@@ -58,7 +62,7 @@ public class PedidoController {
     }
 
     record RealizarPedidoRequest(
-        UUID mesaId,
+            UUID mesaId,
         List<ItemRequest> itens
     ) {}
 
