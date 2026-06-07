@@ -16,8 +16,19 @@ public class BuscarCardapioUseCaseIMPL implements BuscarCardapioUseCase {
 
 
     @Override
-    public List<Produto> buscarTodos() {
-        return produtoCache.buscarTodos();
+    public PaginaCardapio buscarTodos(int pagina,int tamanho) {
+        List<Produto> produtos = produtoCache.buscarTodos();
+        int totalItens = produtos.size();
+        int totalDePaginas =(int)Math.ceil((double) totalItens/tamanho);
+        List<Produto>itensDaPagina = produtos.stream().
+                skip((long)pagina * tamanho ).
+                limit(tamanho).
+                toList();
+        return new PaginaCardapio(itensDaPagina,
+                pagina,
+                totalDePaginas,
+                totalItens,
+                tamanho);
     }
 
     @Override

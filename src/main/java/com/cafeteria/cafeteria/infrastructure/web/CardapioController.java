@@ -25,8 +25,9 @@ public CardapioController(BuscarCardapioUseCase  buscarCardapioUseCase, Adiciona
 }
 @Operation(summary = "Buscar todos os produtos do cardápio")
 @GetMapping
-    public List<Produto>buscarTodos(){
-    return  this.buscarCardapioUseCase.buscarTodos();
+    public BuscarCardapioUseCase.PaginaCardapio buscarTodos(@RequestParam(defaultValue = "0")
+                                    int pagina, @RequestParam(defaultValue = "10") int tamanho) {
+    return  this.buscarCardapioUseCase.buscarTodos(pagina,tamanho);
 }
 @Operation(summary = "Buscar Cardápio por ID")
 @GetMapping("/{id}")
