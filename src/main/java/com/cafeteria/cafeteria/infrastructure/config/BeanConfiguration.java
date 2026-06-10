@@ -1,5 +1,6 @@
 package com.cafeteria.cafeteria.infrastructure.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import com.cafeteria.cafeteria.application.usecase.*;
 import com.cafeteria.cafeteria.domain.model.Pedido;
 import com.cafeteria.cafeteria.domain.port.in.AdicionarProdutoUseCase;
@@ -27,6 +28,8 @@ import java.util.Map;
 
 @Configuration
 public class BeanConfiguration {
+    @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
+    private String bootstrapServers;
 
     @Bean
     public RealizarPedidoUseCase realizarPedidoUseCase(PedidoRepository pedidoRepository,
@@ -50,10 +53,12 @@ public class BeanConfiguration {
         return new KafkaTemplate<>(producerFactory);
     }
 
+ 
+
     @Bean
     public ProducerFactory<String, byte[]> producerFactory() {
         Map<String, Object> configs = new HashMap<>();
-        configs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        configs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
         configs.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 5000);
@@ -65,7 +70,7 @@ public class BeanConfiguration {
     @Bean
     public ConsumerFactory<String, byte[]> consumerFactory() {
         Map<String, Object> configs = new HashMap<>();
-        configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         configs.put(ConsumerConfig.GROUP_ID_CONFIG, "cafeteria-group");
         configs.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,
