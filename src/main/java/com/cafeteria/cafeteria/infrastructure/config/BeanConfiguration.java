@@ -6,8 +6,10 @@ import com.cafeteria.cafeteria.domain.port.in.AdicionarProdutoUseCase;
 import com.cafeteria.cafeteria.domain.port.in.AtualizarStatusUseCase;
 import com.cafeteria.cafeteria.domain.port.in.BuscarCardapioUseCase;
 import com.cafeteria.cafeteria.domain.port.out.ProdutoCache;
-import com.cafeteria.cafeteria.infrastructure.web.BuscarPedidoUseCase;
+
+import com.cafeteria.cafeteria.domain.port.in.BuscarPedidoUseCase;
 import com.cafeteria.cafeteria.domain.port.in.RealizarPedidoUseCase;
+
 import com.cafeteria.cafeteria.domain.port.out.PedidoEventPublisher;
 import com.cafeteria.cafeteria.domain.port.out.PedidoRepository;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

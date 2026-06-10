@@ -3,7 +3,7 @@ package com.cafeteria.cafeteria.application.usecase;
 import com.cafeteria.cafeteria.domain.exception.DomainException;
 import com.cafeteria.cafeteria.domain.model.Pedido;
 import com.cafeteria.cafeteria.domain.port.out.PedidoRepository;
-import com.cafeteria.cafeteria.infrastructure.web.BuscarPedidoUseCase;
+import com.cafeteria.cafeteria.domain.port.in.BuscarPedidoUseCase;
 
 import java.util.UUID;
 
