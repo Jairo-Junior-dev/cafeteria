@@ -7,10 +7,11 @@ import com.cafeteria.cafeteria.domain.port.in.AdicionarProdutoUseCase;
 import com.cafeteria.cafeteria.domain.port.in.AtualizarStatusUseCase;
 import com.cafeteria.cafeteria.domain.port.in.BuscarCardapioUseCase;
 import com.cafeteria.cafeteria.domain.port.out.ProdutoCache;
-
+import com.cafeteria.cafeteria.domain.port.out.UsuarioRepository;
 import com.cafeteria.cafeteria.domain.port.in.BuscarPedidoUseCase;
+import com.cafeteria.cafeteria.domain.port.in.LoginUseCase;
 import com.cafeteria.cafeteria.domain.port.in.RealizarPedidoUseCase;
-
+import com.cafeteria.cafeteria.domain.port.in.RegistrarUsuarioUseCase;
 import com.cafeteria.cafeteria.domain.port.out.PedidoEventPublisher;
 import com.cafeteria.cafeteria.domain.port.out.PedidoRepository;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -22,6 +23,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -95,4 +98,23 @@ public class BeanConfiguration {
     public AdicionarProdutoUseCase adicionarProdutoUseCase(ProdutoCache produtoCache){
         return new AdicionarProdutoUseCaseImpl(produtoCache);
     }
+    @Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+}
+
+@Bean
+public RegistrarUsuarioUseCase registrarUsuarioUseCase(
+        UsuarioRepository usuarioRepository,
+        PasswordEncoder passwordEncoder) {
+    return new RegistrarUsuarioUseCaseImpl(usuarioRepository, passwordEncoder);
+}
+
+@Bean
+public LoginUseCase loginUseCase(
+        UsuarioRepository usuarioRepository,
+        PasswordEncoder passwordEncoder,
+        JwtService jwtService) {
+    return new LoginUseCaseImpl(usuarioRepository, passwordEncoder, jwtService);
+}
 }
