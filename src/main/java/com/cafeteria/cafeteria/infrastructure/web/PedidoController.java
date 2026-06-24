@@ -1,10 +1,25 @@
 package com.cafeteria.cafeteria.infrastructure.web;
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
 
-import com.cafeteria.cafeteria.application.usecase.BuscarPedidoUseCaseImpl;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.cafeteria.cafeteria.domain.model.Pedido;
 import com.cafeteria.cafeteria.domain.model.StatusPedido;
 import com.cafeteria.cafeteria.domain.port.in.AtualizarStatusUseCase;
+import com.cafeteria.cafeteria.domain.port.in.BuscarPedidoUseCase;
 import com.cafeteria.cafeteria.domain.port.in.RealizarPedidoUseCase;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -12,12 +27,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import com.cafeteria.cafeteria.domain.port.in.BuscarPedidoUseCase;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/pedidos")
@@ -38,6 +47,7 @@ public class PedidoController {
     @Operation(summary = "Realizar um novo pedido")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     public PedidoResponse realizar(@Valid @RequestBody RealizarPedidoRequest request) {
         Pedido pedido = realizarPedidoUseCase.realizar(
             request.mesaId(),
@@ -54,6 +64,7 @@ public class PedidoController {
         return toResponse(pedido);
     }
     @Operation(summary="Atualizar Status do pedido" )
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     @PutMapping("/{id}/status")
     public PedidoResponse atualizarStatus(@PathVariable UUID id,@RequestBody AtualizarStatusRequest  request) {
         Pedido pedido = atualizarStatusUseCase.atualizar(id, request.status());
@@ -61,6 +72,7 @@ public class PedidoController {
     }
     @Operation(summary = "Buscar Pedido Por ID")
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('CLIENTE', 'ADMIN')")
     public PedidoResponse buscar(@PathVariable UUID id) {
         Pedido pedido = buscarPedidoUseCase.buscarPedido(id);
         return toResponse(pedido);
