@@ -23,7 +23,7 @@ jobs:
           cache: maven
 
       - name: Compilar e rodar testes unitários
-        run: ./mvnw clean verify -Dtest=PedidoTest -DfailIfNoTests=false
+        run: ./mvnw clean test -Dexcludes="**/CafeteriaApplicationTests.java" -DfailIfNoTests=false
 
       - name: Resultado dos testes
         if: always()
