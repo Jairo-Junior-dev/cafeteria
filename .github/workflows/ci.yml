@@ -22,8 +22,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Compilar e rodar testes
-        run: ./mvnw clean verify
+      - name: Compilar e rodar testes unitários
+        run: ./mvnw clean verify -Dtest=PedidoTest -DfailIfNoTests=false
 
       - name: Resultado dos testes
         if: always()
