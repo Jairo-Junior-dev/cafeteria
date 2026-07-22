@@ -15,6 +15,7 @@ private StatusPedido status;
 private LocalDateTime criadoEm;
 public Pedido(UUID mesaUId){
     this.id = UUID.randomUUID();
+    this.mesaUId = mesaUId;
     this.itens = new ArrayList<>();
     this.status = StatusPedido.CRIADO;
     this.criadoEm = LocalDateTime.now();

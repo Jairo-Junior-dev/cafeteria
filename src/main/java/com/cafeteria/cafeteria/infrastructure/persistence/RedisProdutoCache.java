@@ -13,7 +13,7 @@ import java.util.UUID;
 @Component
 public class RedisProdutoCache implements ProdutoCache {
    private static final String PREFIX = "produto:";
-   private static final Duration TTL = Duration.ofSeconds(30);
+   private static final Duration TTL = Duration.ofMinutes(30);
    private final RedisTemplate<String, Object> redisTemplate;
 
    public RedisProdutoCache(RedisTemplate<String, Object> redisTemplate) {

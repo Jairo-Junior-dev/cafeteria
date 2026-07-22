@@ -22,19 +22,17 @@ import jakarta.annotation.PostConstruct;
 @Component
 public class Bucket4jRateLimiter implements RateLimiterPort {
 
-    // 1. campos primeiro
+    
     private static final long CAPACITY       = 20L;
     private static final long REFILL_SECONDS = 60L;
 
     private final RedissonClient redissonClient;
     private RedissonBasedProxyManager<String> proxyManager;
 
-    // 2. construtor
     public Bucket4jRateLimiter(RedissonClient redissonClient) {
         this.redissonClient = redissonClient;
     }
 
-    // 3. inicialização pós-construção
     @PostConstruct
     public void init() {
         System.out.println(">>[RateLimit] init() chamado");
@@ -54,7 +52,6 @@ public class Bucket4jRateLimiter implements RateLimiterPort {
             System.out.println(">>[RateLimit] proxymanager criado:"+proxyManager);            
         }
 
-    // 4. métodos
     private Bucket resolveBucket(String key) {
         BucketConfiguration config = BucketConfiguration.builder()
             .addLimit(Bandwidth.builder()
@@ -73,14 +70,13 @@ public class Bucket4jRateLimiter implements RateLimiterPort {
     }
 @Override
 public long getWaitTimeInSeconds(String key) {
-        // CORRETO: Tenta consumir 1 token. Como o usuário já estourou o limite,
-    // o método retornará falso e nos dará o tempo exato para o próximo refill.
+
     ConsumptionProbe probe = resolveBucket(key).tryConsumeAndReturnRemaining(1);
     
     if (probe.isConsumed()) {
         return 0L;
     }
-    // Converte de nanossegundos para segundos
+
     return probe.getNanosToWaitForRefill() / 1_000_000_000L;
 }
 

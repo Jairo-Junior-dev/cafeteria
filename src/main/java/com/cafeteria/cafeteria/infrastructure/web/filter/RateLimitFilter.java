@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.cafeteria.cafeteria.domain.port.out.RateLimiterPort;
+import com.cafeteria.cafeteria.domain.port.out.metrics.MetricsPort;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -19,11 +20,13 @@ import jakarta.servlet.http.HttpServletResponse;
 public class RateLimitFilter extends OncePerRequestFilter {
 
     private final RateLimiterPort rateLimiter;
-
+    private final MetricsPort metricsPort;
     // Construtor manual único e limpo para injeção do Spring
-    public RateLimitFilter(RateLimiterPort rateLimiter) {
+    public RateLimitFilter(RateLimiterPort rateLimiter, MetricsPort metricsPort) {
         this.rateLimiter = rateLimiter;
+        this.metricsPort = metricsPort;
         System.out.println(">>> [RateLimit] RateLimitFilter construído com sucesso! RateLimit = " + rateLimiter);
+    
     }
 
     @Override
@@ -44,7 +47,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
             response.setHeader("Retry-After", String.valueOf(wait));
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            
+            metricsPort.incrementarContador("rate_limit.blocked", "endpoint", request.getRequestURI());
             // Escreve a resposta no buffer
             response.getWriter().write("""
                 {"erro": "Muitas requisições. Tente novamente em %d segundos."}
@@ -61,12 +64,9 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
 
     private String resolveKey(HttpServletRequest request) {
-        var auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null
-                && auth.isAuthenticated()
-                && !(auth instanceof AnonymousAuthenticationToken)) {
-            return "user:" + auth.getName();
-        }
+        // Rate limit por IP nesta fase do projeto.
+        // TODO: evoluir para rate limit por usuário autenticado quando houver
+        // cotas diferenciadas por role (cliente/atendente/admin).
         return "ip:" + request.getRemoteAddr();
     }
 }

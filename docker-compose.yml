@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   postgres:
     image: postgres:16
@@ -85,5 +86,34 @@ services:
       kafka:
         condition: service_healthy
 
+  # =========================================================================
+  # ADICIONADO: INFRAESTRUTURA DE OBSERVABILIDADE
+  # =========================================================================
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: cafeteria-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      app:
+        condition: service_started
+
+  grafana:
+    image: grafana/grafana:10.4.1
+    container_name: cafeteria-grafana
+    user: "0" 
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      prometheus:
+        condition: service_started
+
 volumes:
   postgres_data:
+  grafana_data: # Volume criado para salvar os gráficos customizados que desenharmos

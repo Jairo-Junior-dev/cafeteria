@@ -1,16 +1,18 @@
 package com.cafeteria.cafeteria.application.usecase;
 
+import java.util.UUID;
+
 import com.cafeteria.cafeteria.domain.model.Produto;
 import com.cafeteria.cafeteria.domain.port.in.AdicionarProdutoUseCase;
 import com.cafeteria.cafeteria.domain.port.out.ProdutoCache;
-import io.netty.buffer.UnpooledUnsafeDirectByteBuf;
-
-import java.util.UUID;
+import com.cafeteria.cafeteria.domain.port.out.ProdutoRepository;
 
 public class AdicionarProdutoUseCaseImpl implements AdicionarProdutoUseCase {
     private final ProdutoCache produtoCache;
-    public AdicionarProdutoUseCaseImpl(ProdutoCache produtoCache) {
+    private final ProdutoRepository produtoRepository;
+    public AdicionarProdutoUseCaseImpl(ProdutoCache produtoCache, ProdutoRepository produtoRepository) {
         this.produtoCache = produtoCache;
+        this.produtoRepository = produtoRepository;
     }
     @Override
     public Produto adicionarProduto(ProdutoRequestAdd produtoRequestAdd) {
@@ -21,7 +23,8 @@ public class AdicionarProdutoUseCaseImpl implements AdicionarProdutoUseCase {
                 produtoRequestAdd.preco(),
                 true
         );
-         this.produtoCache.salvar(produto); ;
-        return produto;
+    Produto salvo =    this.produtoRepository.salvar(produto); ;
+    this.produtoCache.salvar(salvo);    
+    return salvo;
     }
 }

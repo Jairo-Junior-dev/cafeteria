@@ -49,12 +49,12 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/cardapio", "/cardapio/**").permitAll()
                 .requestMatchers("/pedidos/**").hasAnyRole("CLIENTE", "ATENDENTE", "ADMIN")
-                .anyRequest().authenticated()
+                .requestMatchers("/actuator/health", "/actuator/prometheus").permitAll()
+                .requestMatchers("/actuator/**").hasRole("ADMIN").
+                anyRequest().authenticated()
             )
-            // ADICIONE ESTE BLOCO ABAIXO: impede o Spring de sobrescrever status customizados como o 429
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint((request, response, authException) -> {
-                    // Se o filtro já definiu um status de erro (como 429), não mude para 403
                     if (response.getStatus() == HttpStatus.TOO_MANY_REQUESTS.value()) {
                         return; 
                     }
@@ -62,8 +62,8 @@ public class SecurityConfig {
                 })
             )
             
-            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(jwtAuthFilter, rateLimitFilter.getClass())
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(rateLimitFilter, jwtAuthFilter.getClass())
     
             .build();
     }

@@ -7,11 +7,17 @@ import com.cafeteria.cafeteria.domain.port.in.AdicionarProdutoUseCase;
 import com.cafeteria.cafeteria.domain.port.in.AtualizarStatusUseCase;
 import com.cafeteria.cafeteria.domain.port.in.BuscarCardapioUseCase;
 import com.cafeteria.cafeteria.domain.port.out.ProdutoCache;
+import com.cafeteria.cafeteria.domain.port.out.ProdutoRepository;
 import com.cafeteria.cafeteria.domain.port.out.UsuarioRepository;
+
+import io.micrometer.core.instrument.MeterRegistry;
+
 import com.cafeteria.cafeteria.domain.port.in.BuscarPedidoUseCase;
 import com.cafeteria.cafeteria.domain.port.in.LoginUseCase;
+import com.cafeteria.cafeteria.domain.port.out.metrics.MetricsPortUseCase;
 import com.cafeteria.cafeteria.domain.port.in.RealizarPedidoUseCase;
 import com.cafeteria.cafeteria.domain.port.in.RegistrarUsuarioUseCase;
+import com.cafeteria.cafeteria.domain.port.out.metrics.MetricsPort;
 import com.cafeteria.cafeteria.domain.port.out.PedidoEventPublisher;
 import com.cafeteria.cafeteria.domain.port.out.PedidoRepository;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -36,8 +42,9 @@ public class BeanConfiguration {
 
     @Bean
     public RealizarPedidoUseCase realizarPedidoUseCase(PedidoRepository pedidoRepository,
-                                                       PedidoEventPublisher eventPublisher) {
-        return new RealizarPedidoUseCaseImpl(pedidoRepository, eventPublisher);
+                                                       PedidoEventPublisher eventPublisher,
+                                                        MetricsPort metricsPort) {
+        return new RealizarPedidoUseCaseImpl(pedidoRepository, eventPublisher ,metricsPort);
     }
 
     @Bean
@@ -56,7 +63,10 @@ public class BeanConfiguration {
         return new KafkaTemplate<>(producerFactory);
     }
 
- 
+    @Bean
+    public MetricsPort metricsPortUseCase( MeterRegistry meterRegistry){
+            return new MetricsPortUseCase(meterRegistry);
+    }
 
     @Bean
     public ProducerFactory<String, byte[]> producerFactory() {
@@ -95,16 +105,16 @@ public class BeanConfiguration {
         return new BuscarCardapioUseCaseIMPL(produtoCache);
     }
     @Bean
-    public AdicionarProdutoUseCase adicionarProdutoUseCase(ProdutoCache produtoCache){
-        return new AdicionarProdutoUseCaseImpl(produtoCache);
+    public AdicionarProdutoUseCase adicionarProdutoUseCase(ProdutoCache produtoCache, ProdutoRepository produtoRepository ){
+        return new AdicionarProdutoUseCaseImpl(produtoCache,produtoRepository);
     }
-    @Bean
-public PasswordEncoder passwordEncoder() {
+    @Bean   
+    public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
-}
+    }
 
-@Bean
-public RegistrarUsuarioUseCase registrarUsuarioUseCase(
+    @Bean
+    public RegistrarUsuarioUseCase registrarUsuarioUseCase(
         UsuarioRepository usuarioRepository,
         PasswordEncoder passwordEncoder) {
     return new RegistrarUsuarioUseCaseImpl(usuarioRepository, passwordEncoder);
